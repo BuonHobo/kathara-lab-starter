@@ -20,7 +20,7 @@ class OSPFConfigurer(DaemonConfigurer):
                 lines.append(f"network {lan.full_address} area {area.name}\n")
                 if area.is_stub:
                     lines.append(f"area {area.name} stub\n")
-        lines.append("redistribute connected")
+        lines.append("redistribute connected\n")
 
         path = path.joinpath("etc/frr/")
 
@@ -33,12 +33,10 @@ class OSPFConfigurer(DaemonConfigurer):
 
 class OSPF(Daemon):
     configurer: type[OSPFConfigurer] = OSPFConfigurer
-    name: str = "ospf"
 
     def __init__(self) -> None:
-        super().__init__(self.name)
+        super().__init__()
         self.lans: dict[Lan, Area] = {}
-        self.routers: dict[str, Router] = {}
         self.costs: dict[Router, list[Cost]] = {}
 
     def add_area(self, area: Area):
@@ -46,9 +44,8 @@ class OSPF(Daemon):
             self.lans[lan] = area
 
     def add_router(self, router: Router):
-        super().add_router(router)
-        self.routers[router.name] = router
         self.costs[router] = []
+        return super().add_router(router)
 
     def add_cost(self, router: Router, cost: Cost):
         self.costs[router].append(cost)

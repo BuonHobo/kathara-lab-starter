@@ -1,7 +1,8 @@
 from distutils.dir_util import copy_tree
 from distutils.file_util import copy_file
 from pathlib import Path
-from daemon.ospf.parser import add_ospf
+from daemon.ospf.parser import OSPFParser
+from daemon.rip.parser import RIPParser
 from topology.classes import Router, Topology
 from topology.parser import get_topology
 
@@ -46,6 +47,9 @@ def configure_topology(config: Path, folder: Path):
     initialize_root(config, folder, topology)
 
     if config.joinpath("ospf.yaml").exists():
-        add_ospf(config, topology)
+        OSPFParser(config.joinpath("ospf.yaml")).merge(topology)
+
+    if config.joinpath("rip.yaml").exists():
+        RIPParser(config.joinpath("rip.yaml")).merge(topology)
 
     configure_daemons(folder, topology)
