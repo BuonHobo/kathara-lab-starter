@@ -41,15 +41,15 @@ def configure_daemons(folder, topology):
 
 
 def configure_topology(config: Path, folder: Path):
-    topology: Topology = get_topology(config)
+    topology: Topology = get_topology(config.joinpath("topology.json"))
     make_lab_conf(folder, topology)
     make_startup_files(folder, topology)
     initialize_root(config, folder, topology)
 
     if config.joinpath("ospf.yaml").exists():
-        OSPFParser(config.joinpath("ospf.yaml")).merge(topology)
+        OSPFParser(config.joinpath("ospf.json")).merge(topology)
 
     if config.joinpath("rip.yaml").exists():
-        RIPParser(config.joinpath("rip.yaml")).merge(topology)
+        RIPParser(config.joinpath("rip.json")).merge(topology)
 
     configure_daemons(folder, topology)

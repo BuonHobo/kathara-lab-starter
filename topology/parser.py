@@ -1,11 +1,11 @@
 from pathlib import Path
-import yaml
+import json
 from topology.classes import Router, Lan, Interface, Topology
 
 
 def parse_yaml(path: Path):
     with path.open("r") as l:
-        return yaml.load(l.read(), yaml.Loader)
+        return json.load(l)
 
 
 def parse_topology(topology)->Topology:
@@ -33,4 +33,4 @@ def parse_topology(topology)->Topology:
 
 
 def get_topology(path: Path) -> Topology:
-    return parse_topology(parse_yaml(path.joinpath("topology.yaml")))
+    return parse_topology(parse_yaml(path))

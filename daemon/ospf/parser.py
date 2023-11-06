@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Any
-import yaml
+import json
 from daemon.classes import DaemonParser
 from daemon.ospf.classes import OSPF, Area, Cost
 from topology.classes import Lan, Router, Topology
@@ -10,7 +10,7 @@ class OSPFParser(DaemonParser):
     @staticmethod
     def load(path: Path) -> Any:
         with path.open("r") as l:
-            return yaml.load(l.read(), yaml.Loader)
+            return json.load(l)
 
     def merge(self, topology: Topology):
         areas: dict[str, dict[str, str]] = self.data["areas"]
