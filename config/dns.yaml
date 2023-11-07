@@ -1,0 +1,12 @@
+root:
+  - org:
+    - uniroma3
+  - net:
+    - startup
+
+servers:
+  - root dnsroot
+  - org dnsorg
+  - uniroma3 dnsuni
+  - net dnsnet
+  - startup dnsstart

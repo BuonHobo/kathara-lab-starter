@@ -3,7 +3,7 @@ from typing import Any
 import json
 from daemon.classes import DaemonParser
 from daemon.rip.classes import RIP
-from topology.classes import Router, Topology
+from topology.classes import Topology
 
 
 class RIPParser(DaemonParser):

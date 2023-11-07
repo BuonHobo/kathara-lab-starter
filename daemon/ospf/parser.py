@@ -3,7 +3,7 @@ from typing import Any
 import json
 from daemon.classes import DaemonParser
 from daemon.ospf.classes import OSPF, Area, Cost
-from topology.classes import Lan, Router, Topology
+from topology.classes import Lan, Topology
 
 
 class OSPFParser(DaemonParser):

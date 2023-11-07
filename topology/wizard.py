@@ -1,9 +1,8 @@
-from distutils.dir_util import copy_tree
-from distutils.file_util import copy_file
+import shutil
 from pathlib import Path
 from daemon.ospf.parser import OSPFParser
 from daemon.rip.parser import RIPParser
-from topology.classes import Router, Topology
+from topology.classes import Topology
 from topology.parser import get_topology
 
 
@@ -31,7 +30,7 @@ def initialize_root(config, folder, topology):
     for router in topology.routers:
         path = folder.joinpath(router.name)
         path.mkdir()
-        copy_tree(config.joinpath("etc").as_posix(), path.joinpath("etc").as_posix())
+        shutil.copytree(config.joinpath("etc").as_posix(), path.joinpath("etc").as_posix())
 
 
 def configure_daemons(folder, topology):

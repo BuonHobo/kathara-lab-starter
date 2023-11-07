@@ -3,7 +3,7 @@ import json
 from topology.classes import Router, Lan, Interface, Topology
 
 
-def parse_yaml(path: Path):
+def parse_json(path: Path):
     with path.open("r") as l:
         return json.load(l)
 
@@ -33,4 +33,4 @@ def parse_topology(topology)->Topology:
 
 
 def get_topology(path: Path) -> Topology:
-    return parse_topology(parse_yaml(path))
+    return parse_topology(parse_json(path))
