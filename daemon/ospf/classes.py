@@ -5,18 +5,19 @@ from topology.classes import Interface, Lan, Router
 
 
 class OSPFConfigurer(DaemonConfigurer):
-    @staticmethod
-    def configure(router: Router, daemon: OSPF, path: Path):
-        lines: list[str] = []
+    def __init__(self, daemon: OSPF) -> None:
+        self.daemon: OSPF = daemon
 
-        for cost in daemon.costs[router]:
+    def configure(self, router: Router, path: Path):
+        lines: list[str] = []
+        for cost in self.daemon.costs[router]:
             lines.append(f"interface {cost.interface.name}\n")
             lines.append(f"ospf cost {cost.value}\n")
 
         lines.append("router ospf\n")
         for lan in router.get_lans():
-            if lan in daemon.lans:
-                area = daemon.lans[lan]
+            if lan in self.daemon.lans:
+                area = self.daemon.lans[lan]
                 lines.append(f"network {lan.full_address} area {area.name}\n")
                 if area.is_stub:
                     lines.append(f"area {area.name} stub\n")
@@ -32,10 +33,9 @@ class OSPFConfigurer(DaemonConfigurer):
 
 
 class OSPF(Daemon):
-    configurer: type[OSPFConfigurer] = OSPFConfigurer
-
     def __init__(self) -> None:
         super().__init__()
+        self.configurer: OSPFConfigurer = OSPFConfigurer(self)
         self.lans: dict[Lan, Area] = {}
         self.costs: dict[Router, list[Cost]] = {}
 
@@ -49,6 +49,9 @@ class OSPF(Daemon):
 
     def add_cost(self, router: Router, cost: Cost):
         self.costs[router].append(cost)
+
+    def get_configurer(self) -> DaemonConfigurer:
+        return self.configurer
 
 
 class Area:

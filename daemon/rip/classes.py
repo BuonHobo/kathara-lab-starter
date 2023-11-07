@@ -1,11 +1,14 @@
+from __future__ import annotations
 from pathlib import Path
 from daemon.classes import Daemon, DaemonConfigurer
 from topology.classes import Router
 
 
 class RIPConfigurer(DaemonConfigurer):
-    @staticmethod
-    def configure(router: Router, daemon: Daemon, path: Path):
+    def __init__(self, daemon: RIP) -> None:
+        self.daemon = daemon
+
+    def configure(self, router: Router, path: Path):
         lines: list[str] = []
 
         lines.append("router rip\n")
@@ -23,4 +26,8 @@ class RIPConfigurer(DaemonConfigurer):
 
 
 class RIP(Daemon):
-    configurer: type[RIPConfigurer] = RIPConfigurer
+    def __init__(self) -> None:
+        self.configurer = RIPConfigurer(self)
+
+    def get_configurer(self) -> DaemonConfigurer:
+        return self.configurer

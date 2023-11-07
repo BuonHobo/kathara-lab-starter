@@ -1,4 +1,6 @@
 from __future__ import annotations
+import daemon.classes
+
 
 class Lan:
     def __init__(self, name: str, full_address: str) -> None:
@@ -13,23 +15,23 @@ class Lan:
 
 class Router:
     def __init__(self, name: str) -> None:
-        self.interfaces: dict[str,Interface] = {}
+        self.interfaces: dict[str, Interface] = {}
         self.name = name
-        self.daemons = []
+        self.daemons: list[daemon.classes.Daemon] = []
 
     def add_interface(self, interface: Interface):
-        self.interfaces[interface.name]=interface
+        self.interfaces[interface.name] = interface
 
-    def add_daemon(self, daemon):
+    def add_daemon(self, daemon: daemon.classes.Daemon):
         self.daemons.append(daemon)
 
-    def get_lans(self)->list[Lan]:
-        lans:list[Lan] = []
+    def get_lans(self) -> list[Lan]:
+        lans: list[Lan] = []
         for interface in self.interfaces.values():
             lans.append(interface.lan)
         return lans
-    
-    def get_interface(self,name:str)->Interface:
+
+    def get_interface(self, name: str) -> Interface:
         return self.interfaces[name]
 
     def __repr__(self) -> str:
@@ -54,19 +56,19 @@ class Interface:
 
 class Topology:
     def __init__(self) -> None:
-        self.routers:list[Router]=[]
-    
-    def add_router(self,router:Router):
+        self.routers: list[Router] = []
+
+    def add_router(self, router: Router):
         self.routers.append(router)
 
-    def get_lans(self)->list[Lan]:
-        lans:list[Lan]=[]
+    def get_lans(self) -> list[Lan]:
+        lans: list[Lan] = []
         for router in self.routers:
             lans.extend(router.get_lans())
         return lans
-    
-    def get_lan_map(self)->dict[str,Lan]:
-        return {lan.name:lan for lan in self.get_lans()}
-    
-    def get_router_map(self)-> dict[str,Router]:
-        return {router.name:router for router in self.routers}
+
+    def get_lan_map(self) -> dict[str, Lan]:
+        return {lan.name: lan for lan in self.get_lans()}
+
+    def get_router_map(self) -> dict[str, Router]:
+        return {router.name: router for router in self.routers}

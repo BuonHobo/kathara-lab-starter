@@ -26,20 +26,25 @@ def make_startup_files(folder: Path, topology: Topology, frr: bool = True):
             file.writelines(lines)
 
 
-def initialize_root(config, folder, topology):
+def initialize_root(config: Path, folder: Path, topology: Topology):
     for router in topology.routers:
         path = folder.joinpath(router.name)
         path.mkdir()
-        shutil.copytree(config.joinpath("etc").as_posix(), path.joinpath("etc").as_posix())
+        shutil.copytree(
+            config.joinpath("etc").as_posix(), path.joinpath("etc").as_posix()
+        )
 
 
-def configure_daemons(folder, topology):
+def configure_daemons(folder: Path, topology: Topology):
     for router in topology.routers:
         for daemon in router.daemons:
-            daemon.configurer.configure(router, daemon, folder.joinpath(router.name))
+            daemon.get_configurer().configure(router, folder.joinpath(router.name))
 
 
 def configure_topology(config: Path, folder: Path):
+    if folder.exists():
+        shutil.rmtree(folder.as_posix())
+    folder.mkdir()
     topology: Topology = get_topology(config.joinpath("topology.json"))
     make_lab_conf(folder, topology)
     make_startup_files(folder, topology)
