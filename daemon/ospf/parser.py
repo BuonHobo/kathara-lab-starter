@@ -7,8 +7,7 @@ from topology.classes import Lan, Topology
 
 
 class OSPFParser(DaemonParser):
-    @staticmethod
-    def load(path: Path) -> Any:
+    def load(self, path: Path) -> Any:
         with path.open("r") as l:
             return json.load(l)
 
