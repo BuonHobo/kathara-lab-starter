@@ -45,15 +45,16 @@ def configure_topology(config: Path, folder: Path):
     if folder.exists():
         shutil.rmtree(folder.as_posix())
     folder.mkdir()
+
     topology: Topology = get_topology(config.joinpath("topology.json"))
     make_lab_conf(folder, topology)
     make_startup_files(folder, topology)
     initialize_root(config, folder, topology)
 
-    if config.joinpath("ospf.yaml").exists():
+    if config.joinpath("ospf.json").exists():
         OSPFParser(config.joinpath("ospf.json")).merge(topology)
 
-    if config.joinpath("rip.yaml").exists():
+    if config.joinpath("rip.json").exists():
         RIPParser(config.joinpath("rip.json")).merge(topology)
 
     configure_daemons(folder, topology)
