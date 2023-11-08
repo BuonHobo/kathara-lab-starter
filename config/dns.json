@@ -1,0 +1,19 @@
+{
+  "root": {
+     "org": [
+        "uniroma3"
+     ],
+     "net": [
+        "startup",
+        "ciao"
+     ]
+  },
+  "servers": [
+     "root r12",
+     "org r31",
+     "uniroma3 r21",
+     "net b03",
+     "startup b02",
+     "ciao b012"
+  ]
+}

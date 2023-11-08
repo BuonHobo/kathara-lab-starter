@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from daemon.dns.parser import DNSParser
 from daemon.ospf.parser import OSPFParser
 from daemon.rip.parser import RIPParser
 from topology.classes import Topology
@@ -56,5 +57,8 @@ def configure_topology(config: Path, folder: Path):
 
     if config.joinpath("rip.json").exists():
         RIPParser(config.joinpath("rip.json")).merge(topology)
+
+        if config.joinpath("dns.json").exists():
+            DNSParser(config.joinpath("dns.json")).merge(topology)
 
     configure_daemons(folder, topology)

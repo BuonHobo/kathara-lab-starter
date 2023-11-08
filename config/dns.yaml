@@ -1,12 +1,14 @@
 root:
-  - org:
+  org:
     - uniroma3
-  - net:
+  net:
     - startup
+    - ciao
 
 servers:
-  - root dnsroot
-  - org dnsorg
-  - uniroma3 dnsuni
-  - net dnsnet
-  - startup dnsstart
+  - root r12
+  - org r31
+  - uniroma3 r21
+  - net b03
+  - startup b02
+  - ciao b012

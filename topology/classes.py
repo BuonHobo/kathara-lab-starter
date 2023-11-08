@@ -18,9 +18,14 @@ class Router:
         self.interfaces: dict[str, Interface] = {}
         self.name = name
         self.daemons: list[daemon.classes.Daemon] = []
+        self.router_id: str | None = None
 
     def add_interface(self, interface: Interface):
         self.interfaces[interface.name] = interface
+        if self.router_id is None:
+            self.router_id = interface.address
+        else:
+            self.router_id = max(self.router_id, interface.address)
 
     def add_daemon(self, daemon: daemon.classes.Daemon):
         self.daemons.append(daemon)
