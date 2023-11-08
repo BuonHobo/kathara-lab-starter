@@ -29,7 +29,7 @@ class DNSConfigurer(DaemonConfigurer):
                     continue
                 name = zone.get_full_name().removesuffix(".")
                 f.write(
-                    f'zone "{name}" {"{"}\n    type master;\n    file "/etc/bind/db.{name}";{"}"};\n\n'
+                    f'zone "{name}" {"{"}\n    type master;\n    file "/etc/bind/db.{name}";\n{"}"};\n\n'
                 )
 
         for zone in self.dns.routers_to_zones[router]:
