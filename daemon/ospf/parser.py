@@ -13,7 +13,7 @@ class OSPFParser(DaemonParser):
 
     def merge(self, topology: Topology):
         areas: dict[str, dict[str, str]] = self.data["areas"]
-        stubs: dict[str, str] = areas["stubs"]
+        stubs: dict[str, str] = areas["stubs"] if "stubs" in areas else {}
         backbones: dict[str, str] = areas["backbones"]
         parsed_lans: dict[str, Lan] = topology.get_lan_map()
         parsed_routers = topology.get_router_map()
