@@ -7,7 +7,7 @@ class Lan:
         self.name = name
         self.full_address = full_address
         self.address, _, self.netmask = full_address.partition("/")
-        self.stripped_address = self.address.removesuffix(".0")
+        self.stripped_address = ".".join(self.address.split(".")[:-1])
 
     def __repr__(self) -> str:
         return f"({self.name}: {self.full_address})"
