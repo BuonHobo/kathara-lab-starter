@@ -12,7 +12,7 @@ def parse_json(path: Path):
 def parse_topology(topology: dict[str, Any]) -> Topology:
     lans: dict[str, str] = topology["lans"]
     parsed_lans: dict[str, Lan] = {
-        name: Lan(name, full_address) for name, full_address in lans.items()
+        name: Lan(name.upper(), full_address) for name, full_address in lans.items()
     }
     routers: dict[str, dict[str, str]] = topology["routers"]
 
@@ -24,7 +24,7 @@ def parse_topology(topology: dict[str, Any]) -> Topology:
         for interface_name, interface_data in interfaces.items():
             split_data = interface_data.split()
             byte = split_data[0]
-            lan = parsed_lans[split_data[1]]
+            lan = parsed_lans[split_data[1].upper()]
             interface: Interface = Interface(interface_name, byte, lan)
             router.add_interface(interface)
 
