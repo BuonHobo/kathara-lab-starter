@@ -247,14 +247,12 @@ class BGP(FRRDaemon):  # Stores the bgp data
         super().__init__()
         self.configurer = BGPConfigurer(self)
         # Init bgp specific data structures
-        self.as_to_router: dict[str, list[Router]] = defaultdict(list)
         self.router_to_as: dict[Router, str] = {}
 
     def get_configurer(self) -> DaemonConfigurer:
         return self.configurer
 
     def add_as_router(self, as_name: str, router: Router) -> None:
-        self.as_to_router[as_name].append(router)
         self.router_to_as[router] = as_name
         return super().add_router(router)
 
@@ -303,6 +301,8 @@ class BGPConfigurer(DaemonConfigurer):  # Writes the bgp config
 
         # aggiunge tutti i neighbors
         for interface in router.get_neighbors():
+            if interface.router not in self.bgp.router_to_as:
+                continue
             lines.append(
                 f"neighbor {interface.address} remote-as {self.bgp.router_to_as[interface.router]}\n"
             )
