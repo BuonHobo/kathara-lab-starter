@@ -248,12 +248,14 @@ class BGP(FRRDaemon):  # Stores the bgp data
         self.configurer = BGPConfigurer(self)
         # Init bgp specific data structures
         self.router_to_as: dict[Router, str] = {}
+        self.as_to_router: dict[str, list[Router]] = defaultdict(list)
 
     def get_configurer(self) -> DaemonConfigurer:
         return self.configurer
 
     def add_as_router(self, as_name: str, router: Router) -> None:
         self.router_to_as[router] = as_name
+        self.as_to_router[as_name].append(router)
         return super().add_router(router)
 
 
@@ -299,16 +301,45 @@ class BGPConfigurer(DaemonConfigurer):  # Writes the bgp config
         lines.append(f"! no bgp ebgp-requires-policy\n")
         lines.append(f"! no bgp network import-check\n\n")
 
-        # aggiunge tutti i neighbors
-        for interface in router.get_neighbors():
-            if interface.router not in self.bgp.router_to_as:
-                continue
+        vicini = [
+            iface
+            for iface in router.get_neighbors()
+            if iface.router in self.bgp.router_to_as
+        ]
+        esterni = [
+            iface for iface in vicini if self.bgp.router_to_as[iface.router] != as_name
+        ]
+        interni = [iface for iface in vicini if iface not in esterni]
+
+        # aggiunge tutti i neighbors interni
+        non_connessi = [
+            r
+            for r in self.bgp.as_to_router[as_name]
+            if r not in (interface.router for interface in interni) and r is not router
+        ]
+        for router in non_connessi:
             lines.append(
-                f"neighbor {interface.address} remote-as {self.bgp.router_to_as[interface.router]}\n"
+                f"neighbor <{router.name} {router.router_id}> remote-as {as_name}\n"
             )
             lines.append(
-                f"neighbor {interface.address} description {interface.router.name}\n\n"
+                f"neighbor <{router.name} {router.router_id}> description {router.name}\n\n"
             )
+
+        for iface in interni:
+            lines.append(f"neighbor {iface.router.name} remote-as {as_name}\n")
+            lines.append(
+                f"neighbor {iface.address} description {iface.router.name}\n\n"
+            )
+
+        # aggiunge tutti i neighbors esterni
+        for interface in esterni:
+            if self.bgp.router_to_as[interface.router] != as_name:
+                lines.append(
+                    f"neighbor {interface.address} remote-as {self.bgp.router_to_as[interface.router]}\n"
+                )
+                lines.append(
+                    f"neighbor {interface.address} description {interface.router.name}\n\n"
+                )
 
         # aggiunge tutte le network
         for lan in router.get_lans():
