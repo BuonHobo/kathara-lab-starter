@@ -15,16 +15,20 @@ class Daemon(ABC):
 
 
 class DaemonConfigurer(ABC):
-    daemon_type: type[Daemon]
-
     @abstractmethod
-    def configure(self, router: Router, path: Path):
+    def configure(self, router: Router, path: Path, data: Path):
         pass
 
 
 class DaemonParser(ABC):
     def __init__(self, path: Path) -> None:
         self.data = self.load(path)
+        self.daemon = self.init_daemon()
+
+    @staticmethod
+    @abstractmethod
+    def get_name() -> str:
+        pass
 
     @abstractmethod
     def load(self, path: Path) -> Any:
@@ -32,4 +36,14 @@ class DaemonParser(ABC):
 
     @abstractmethod
     def merge(self, topology: Topology):
+        pass
+
+    def get_daemon(self) -> Daemon:
+        return self.daemon
+
+    def init_daemon(self) -> Daemon:
+        return self.get_daemon_type()()
+
+    @abstractmethod
+    def get_daemon_type(self) -> type[Daemon]:
         pass
