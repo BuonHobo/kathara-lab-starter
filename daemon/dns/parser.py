@@ -11,6 +11,10 @@ class DNSParser(DaemonParser):
         with path.open("r") as f:
             return json.load(f)
 
+    @staticmethod
+    def get_name() -> str:
+        return "dns"
+
     def zone_tree(
         self,
         parent: Zone,

@@ -8,6 +8,10 @@ class Lan:
         self.full_address = full_address
         self.address, _, self.netmask = full_address.partition("/")
         self.stripped_address = ".".join(self.address.split(".")[:-1])
+        self.interfaces: list[Interface] = []
+
+    def add_interface(self, inter: Interface):
+        self.interfaces.append(inter)
 
     def __repr__(self) -> str:
         return f"({self.name}: {self.full_address})"
@@ -39,6 +43,14 @@ class Router:
     def get_interface(self, name: str) -> Interface:
         return self.interfaces[name]
 
+    def get_neighbors(self) -> list[Interface]:
+        res: list[Interface] = []
+        for lan in self.get_lans():
+            for interface in lan.interfaces:
+                if interface.router is not self:
+                    res.append(interface)
+        return res
+
     def __repr__(self) -> str:
         interfaces = ""
         for interface in self.interfaces:
@@ -48,12 +60,18 @@ class Router:
 
 
 class Interface:
-    def __init__(self, name: str, byte: str, lan: Lan) -> None:
+    def __init__(self, name: str, byte: str, lan: Lan, router: Router) -> None:
         self.name = name
         self.number = name[-1]
         self.address = lan.stripped_address + "." + byte
         self.full_address = self.address + "/" + lan.netmask
         self.lan = lan
+        self.router: Router = router
+        router.add_interface(self)
+        lan.add_interface(self)
+
+    def add_router(self, router: Router):
+        self.router = router
 
     def __repr__(self) -> str:
         return f"({self.name}: {self.full_address})"
@@ -77,3 +95,8 @@ class Topology:
 
     def get_router_map(self) -> dict[str, Router]:
         return {router.name: router for router in self.routers}
+
+    def get_router_by_name(self, name: str) -> Router | None:
+        for router in self.routers:
+            if router.name == name:
+                return router

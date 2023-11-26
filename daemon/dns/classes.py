@@ -8,7 +8,7 @@ class DNSConfigurer(DaemonConfigurer):
     def __init__(self, dns: DNSDaemon) -> None:
         self.dns = dns
 
-    def configure(self, router: Router, path: Path):
+    def configure(self, router: Router, path: Path, data: Path):
         path = path.joinpath("etc/bind")
         path.mkdir()
 
@@ -25,7 +25,7 @@ class DNSConfigurer(DaemonConfigurer):
             f.write('    file "/etc/bind/db.root";\n};\n\n')
 
             for zone in self.dns.routers_to_zones[router]:
-                if zone.name=="":
+                if zone.name == "":
                     continue
                 name = zone.get_full_name().removesuffix(".")
                 f.write(
@@ -35,9 +35,12 @@ class DNSConfigurer(DaemonConfigurer):
         for zone in self.dns.routers_to_zones[router]:
             pass
 
-        if router!=self.dns.rootserver:
+        if router != self.dns.rootserver:
             with path.joinpath("db.root").open("w") as f:
-                f.write(f'.                   IN  NS    ROOT-SERVER.\nROOT-SERVER.        IN  A     {self.dns.rootserver.router_id}')
+                f.write(
+                    f".                   IN  NS    ROOT-SERVER.\nROOT-SERVER.        IN  A     {self.dns.rootserver.router_id}"
+                )
+
 
 class DNSDaemon(Daemon):
     def __init__(self, root: Zone) -> None:

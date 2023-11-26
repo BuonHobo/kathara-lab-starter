@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from daemon.dns.parser import DNSParser
 from daemon.frr.frr import FRR
 from topology.classes import Topology
 from topology.parser import get_topology
@@ -49,5 +50,7 @@ def configure_topology(config: Path, target: Path, data: Path = Path("data")):
     initialize_root(config, target, topology)
 
     FRR(config, topology)
+    if config.joinpath("dns.json").exists():
+        DNSParser(config.joinpath("dns.json")).merge(topology)
 
     configure_daemons(target, data, topology)

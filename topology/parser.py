@@ -25,8 +25,7 @@ def parse_topology(topology: dict[str, Any]) -> Topology:
             split_data = interface_data.split()
             byte = split_data[0]
             lan = parsed_lans[split_data[1].upper()]
-            interface: Interface = Interface(interface_name, byte, lan)
-            router.add_interface(interface)
+            Interface(interface_name, byte, lan, router)
 
         result.add_router(router)
 

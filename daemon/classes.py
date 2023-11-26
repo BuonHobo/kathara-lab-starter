@@ -23,7 +23,6 @@ class DaemonConfigurer(ABC):
 class DaemonParser(ABC):
     def __init__(self, path: Path) -> None:
         self.data = self.load(path)
-        self.daemon = self.init_daemon()
 
     @staticmethod
     @abstractmethod
@@ -36,14 +35,4 @@ class DaemonParser(ABC):
 
     @abstractmethod
     def merge(self, topology: Topology):
-        pass
-
-    def get_daemon(self) -> Daemon:
-        return self.daemon
-
-    def init_daemon(self) -> Daemon:
-        return self.get_daemon_type()()
-
-    @abstractmethod
-    def get_daemon_type(self) -> type[Daemon]:
         pass

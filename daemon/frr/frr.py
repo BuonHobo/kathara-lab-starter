@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import abstractmethod
 from collections import defaultdict
 from pathlib import Path
 from daemon.classes import Daemon, DaemonConfigurer, DaemonParser
@@ -40,7 +41,7 @@ class FRR(Daemon):
         self.router_to_daemons[router].append(daemon)
 
     def configure_daemons(self, config: Path, topology: Topology):
-        for daemon in (OSPFParser, RIPParser):
+        for daemon in (OSPFParser, RIPParser, BGPParser):
             conf_path = config.joinpath(f"{daemon.get_name()}.json")
             if conf_path.exists():
                 parser = daemon(conf_path, self)
@@ -58,12 +59,20 @@ class FRRDaemon(Daemon):
 class FRRParser(DaemonParser):
     def __init__(self, path: Path, frr: FRR) -> None:
         self.frr = frr
+        self.daemon = self.init_daemon()
         super().__init__(path)
 
     def init_daemon(self) -> Daemon:
-        daemon: FRRDaemon = super().init_daemon()  # type:ignore
+        daemon: FRRDaemon = self.get_daemon_type()()  # type:ignore
         daemon.setFRR(self.frr)
         return daemon
+
+    def get_daemon(self) -> Daemon:
+        return self.daemon
+
+    @abstractmethod
+    def get_daemon_type(self) -> type[Daemon]:
+        pass
 
 
 class RIPParser(FRRParser):
@@ -231,3 +240,79 @@ class Cost:
     def __init__(self, interface: Interface, value: str) -> None:
         self.interface = interface
         self.value = value
+
+
+class BGP(FRRDaemon):  # Stores the bgp data
+    def __init__(self) -> None:
+        super().__init__()
+        self.configurer = BGPConfigurer(self)
+        # Init bgp specific data structures
+        self.as_to_router: dict[str, list[Router]] = defaultdict(list)
+        self.router_to_as: dict[Router, str] = {}
+
+    def get_configurer(self) -> DaemonConfigurer:
+        return self.configurer
+
+    def add_as_router(self, as_name: str, router: Router) -> None:
+        self.as_to_router[as_name].append(router)
+        self.router_to_as[router] = as_name
+        return super().add_router(router)
+
+
+class BGPParser(FRRParser):  # Parses the bgp data
+    def load(self, path: Path) -> Any:
+        with path.open("r") as l:
+            return json.load(l)
+
+    @staticmethod
+    def get_name() -> str:
+        return "bgp"
+
+    def get_daemon_type(self) -> type[Daemon]:
+        return BGP
+
+    def get_bgp(self) -> BGP:
+        return self.get_daemon()  # type:ignore
+
+    def merge(self, topology: Topology):
+        ASes: list[str] = self.data["AS"]
+        bgp = self.get_bgp()
+
+        for line in ASes:
+            line = line.split()
+            ASn: str = line.pop(0)
+            for router in line:
+                r = topology.get_router_by_name(router)
+                if r:
+                    bgp.add_as_router(ASn, r)
+
+
+class BGPConfigurer(DaemonConfigurer):  # Writes the bgp config
+    def __init__(self, bgp: BGP) -> None:
+        self.bgp = bgp
+
+    def configure(self, router: Router, path: Path, data: Path):
+        with path.joinpath("etc/frr/daemons").open("a") as f:
+            f.write("\nbgpd=yes")
+
+        lines: list[str] = []
+        as_name = self.bgp.router_to_as[router]
+        lines.append(f"router bgp {as_name}\n\n")
+        lines.append(f"! no bgp ebgp-requires-policy\n")
+        lines.append(f"! no bgp network import-check\n\n")
+
+        # aggiunge tutti i neighbors
+        for interface in router.get_neighbors():
+            lines.append(
+                f"neighbor {interface.address} remote-as {self.bgp.router_to_as[interface.router]}\n"
+            )
+            lines.append(
+                f"neighbor {interface.address} description {interface.router.name}\n\n"
+            )
+
+        # aggiunge tutte le network
+        for lan in router.get_lans():
+            lines.append(f"network {lan.full_address}\n")
+
+        with path.joinpath("etc/frr/frr.conf").open("a") as f:
+            f.writelines(lines)
