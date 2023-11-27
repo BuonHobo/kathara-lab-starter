@@ -326,7 +326,7 @@ class BGPConfigurer(DaemonConfigurer):  # Writes the bgp config
             )
 
         for iface in interni:
-            lines.append(f"neighbor {iface.router.name} remote-as {as_name}\n")
+            lines.append(f"neighbor {iface.address} remote-as {as_name}\n")
             lines.append(
                 f"neighbor {iface.address} description {iface.router.name}\n\n"
             )
