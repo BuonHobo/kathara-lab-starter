@@ -319,10 +319,10 @@ class BGPConfigurer(DaemonConfigurer):  # Writes the bgp config
         ]
         for rt in non_connessi:
             lines.append(
-                f"neighbor <{rt.name} {router.router_id}> remote-as {as_name}\n"
+                f"neighbor <{rt.name} {rt.router_id}> remote-as {as_name}\n"
             )
             lines.append(
-                f"neighbor <{rt.name} {router.router_id}> description {rt.name}\n\n"
+                f"neighbor <{rt.name} {rt.router_id}> description {rt.name}\n\n"
             )
 
         for iface in interni:
