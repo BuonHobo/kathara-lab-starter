@@ -297,6 +297,15 @@ class BGPConfigurer(DaemonConfigurer):  # Writes the bgp config
 
         lines: list[str] = []
         as_name = self.bgp.router_to_as[router]
+        lines.append("""log file /var/log/frr/frr.log
+
+debug bgp
+debug bgp events
+debug bgp filters
+debug bgp fsm
+debug bgp keepalives
+debug bgp updates
+""")
         lines.append(f"router bgp {as_name}\n\n")
         lines.append(f"! no bgp ebgp-requires-policy\n")
         lines.append(f"! no bgp network import-check\n\n")
