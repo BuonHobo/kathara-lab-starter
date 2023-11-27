@@ -317,12 +317,12 @@ class BGPConfigurer(DaemonConfigurer):  # Writes the bgp config
             for r in self.bgp.as_to_router[as_name]
             if r not in (interface.router for interface in interni) and r is not router
         ]
-        for router in non_connessi:
+        for rt in non_connessi:
             lines.append(
-                f"neighbor <{router.name} {router.router_id}> remote-as {as_name}\n"
+                f"neighbor <{rt.name} {router.router_id}> remote-as {as_name}\n"
             )
             lines.append(
-                f"neighbor <{router.name} {router.router_id}> description {router.name}\n\n"
+                f"neighbor <{rt.name} {router.router_id}> description {rt.name}\n\n"
             )
 
         for iface in interni:
