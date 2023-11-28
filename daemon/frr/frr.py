@@ -305,6 +305,7 @@ debug bgp filters
 debug bgp fsm
 debug bgp keepalives
 debug bgp updates
+                     
 """)
         lines.append(f"router bgp {as_name}\n\n")
         lines.append(f"! no bgp ebgp-requires-policy\n")
