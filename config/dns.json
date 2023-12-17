@@ -1,19 +1,26 @@
 {
-  "root": {
-     "org": [
-        "uniroma3"
-     ],
-     "net": [
-        "startup",
-        "ciao"
-     ]
-  },
-  "servers": [
-     "root r12",
-     "org r31",
-     "uniroma3 r21",
-     "net b03",
-     "startup b02",
-     "ciao b012"
-  ]
+   "root": {
+      "it": [
+         "uniroma3"
+      ],
+      "net": [
+         "startup"
+      ]
+   },
+   "servers": [
+      "root dnsroot",
+      "it dnsit",
+      "net dnsnet",
+      "startup dnsstart",
+      "uniroma3 dnsuni"
+   ],
+   "names": [
+      "pc1 uniroma3",
+      "localuni uniroma3",
+      "pc2 startup"
+   ],
+   "resolvers": [
+      "localuni pc1",
+      "localstart pc2"
+   ]
 }

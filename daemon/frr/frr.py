@@ -19,7 +19,7 @@ class FRRConfigurer(DaemonConfigurer):
         with path.parent.joinpath(router.name + ".startup").open("a") as f:
             f.write("\nsystemctl start frr\n")
         # copies /etc/frr in that computer's root
-        path.joinpath("etc").mkdir()
+        path.joinpath("etc").mkdir(exist_ok=True)
         copytree(data.joinpath("frr"), path.joinpath("etc/frr"))
         # configures all required daemons
         for daemon in self.daemon.router_to_daemons[router]:
