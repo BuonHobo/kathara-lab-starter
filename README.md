@@ -26,3 +26,18 @@ Finally, generate your lab
 python main.py my-config my-lab
 ```
 This is obviously not ideal, but it works for now...
+
+# How to add a protocol
+
+This tool is meant to be easy to extend. For now, it's easy to add a new protocol by implementing [these interfaces](daemon/classes.py).
+
+DaemonParser is the class that reads information from the json file and uses it to build a Daemon with all of the domain information.
+A Deamon can add itself to a router using the `Daemon.add_router(Router: router)` method.
+DaemonConfigurer is the class that will configure each router one at a time, using data about the topology and the domain data stored in Daemon.
+
+After implementing everything, you just need to make sure that the `DaemonParser.merge()` method is called within the `configure_topology()` method in [topology/wizard.py](wizard.py).
+You could add a couple of lines that look like this:
+```python
+if config.joinpath("dns.json").exists():
+    DNSParser(config.joinpath("dns.json")).merge(topology)
+```
