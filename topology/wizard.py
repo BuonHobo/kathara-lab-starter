@@ -21,6 +21,11 @@ def make_startup_files(folder: Path, topology: Topology):
         lines: list[str] = []
         for interface in router.interfaces.values():
             lines.append(f"ip a add {interface.full_address} dev {interface.name}\n")
+        if router.default_router is not None:
+            d_r =router.default_router
+            for iface in router.get_neighbors():
+                if iface.router is d_r:
+                    lines.append(f"ip route add default via {iface.address}\n")
         with folder.joinpath(f"{router.name}.startup").open("w") as file:
             file.writelines(lines)
 

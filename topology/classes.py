@@ -23,6 +23,7 @@ class Router:
         self.name = name
         self.daemons: list[daemon.classes.Daemon] = []
         self.router_id: str | None = None
+        self.default_router = None
 
     def add_interface(self, interface: Interface):
         self.interfaces[interface.name] = interface
@@ -33,6 +34,9 @@ class Router:
 
     def add_daemon(self, daemon: daemon.classes.Daemon):
         self.daemons.append(daemon)
+
+    def set_default_router(self, rtr: Router):
+        self.default_router = rtr
 
     def get_lans(self) -> list[Lan]:
         lans: list[Lan] = []
