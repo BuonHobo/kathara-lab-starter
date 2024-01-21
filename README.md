@@ -27,6 +27,8 @@ python main.py my-config my-lab
 ```
 This is obviously not ideal, but it works for now...
 
+The default [config](config) reproduces [this lab](https://github.com/KatharaFramework/Kathara-Labs/blob/main/main-labs/labs-integrating-several-technologies/small-internet-with-dns-and-web-server/kathara-lab_small-internet-with-dns-and-web-server.pdf) without needing any tweaks (although the routing is very "dumb" by default)
+
 # How to add a protocol
 
 This tool is meant to be easy to extend. For now, it's easy to add a new protocol by implementing [these interfaces](daemon/classes.py).
@@ -41,3 +43,23 @@ You could add a couple of lines that look like this:
 if config.joinpath("dns.json").exists():
     DNSParser(config.joinpath("dns.json")).merge(topology)
 ```
+
+# TOPOLOGY
+
+It basically does what you expect: sets up the lab.conf and adds the ip address on each router interface.
+You can also set the default gateway for each client.
+All you have to do is specify the LANs and associate the names. Then for each router you can set the last byte of its address and the LAN that it sees on each interface.
+
+# DNS
+
+Under "root" you can describe the dns hierarchy, the "leaf zones" are in arrays because they don't have children.
+Under "servers" you can specify in each line the name zone and the server for that zone.
+Under "names" you can specify which zone a router name belongs to.
+Under "resolvers" you can specify a dns solver and the clients that use it.
+
+# OSPF
+
+Under Areas you can specify which areas are stubs or not and associate the appropriate LANs, make sure to give them all different names.
+Then you can specify which routers speak OSPF (on all interfaces by default) and the costs for each router on each interface (ALL on different lines).
+
+### to be continued...

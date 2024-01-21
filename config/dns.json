@@ -1,26 +1,18 @@
 {
    "root": {
       "it": [
-         "uniroma3"
-      ],
-      "net": [
-         "startup"
+         "r3"
       ]
    },
    "servers": [
-      "root dnsroot",
-      "it dnsit",
-      "net dnsnet",
-      "startup dnsstart",
-      "uniroma3 dnsuni"
+      "root rootdns",
+      "it itdns",
+      "r3 r3dns"
    ],
    "names": [
-      "pc1 uniroma3",
-      "localuni uniroma3",
-      "pc2 startup"
+      "webserver r3"
    ],
    "resolvers": [
-      "localuni pc1",
-      "localstart pc2"
+      "ldns client webserver"
    ]
 }
