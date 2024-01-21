@@ -109,6 +109,7 @@ class RIPConfigurer(DaemonConfigurer):
         for lan in router.get_lans():
             lines.append(f"network {lan.full_address}\n")
         lines.append("redistribute connected\n\n")
+        lines.append("redistribute bgp\n\n")
 
         path = path.joinpath("etc/frr/")
 
@@ -194,6 +195,7 @@ class OSPFConfigurer(DaemonConfigurer):
                 if area.is_stub:
                     lines.append(f"area {area.name} stub\n")
         lines.append("redistribute connected\n\n")
+        lines.append("redistribute bgp\n\n")
 
         path = path.joinpath("etc/frr/")
 
@@ -308,8 +310,10 @@ debug bgp updates
                      
 """)
         lines.append(f"router bgp {as_name}\n\n")
-        lines.append(f"! no bgp ebgp-requires-policy\n")
-        lines.append(f"! no bgp network import-check\n\n")
+        lines.append(f"redistribute rip\n\n")
+        lines.append(f"redistribute ospf\n\n")
+        lines.append(f"no bgp ebgp-requires-policy\n")
+        lines.append(f"no bgp network import-check\n\n")
 
         vicini = [
             iface
